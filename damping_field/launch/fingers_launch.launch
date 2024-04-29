@@ -1,0 +1,9 @@
+<launch>
+
+	<node name="hglove2allegro_index" pkg="damping_field" type="hglove2allegro_index" />
+
+	<node name="hglove2allegro_middle" pkg="damping_field" type="hglove2allegro_middle" />
+
+
+</launch>
+

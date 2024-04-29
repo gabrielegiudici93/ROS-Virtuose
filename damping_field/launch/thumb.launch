@@ -1,0 +1,13 @@
+<launch>
+	
+	<node name="thumb_node" pkg="virtuose" type="thumb_node" />
+	<node name="index_node" pkg="virtuose" type="index_node" />
+	<node name="middle_node" pkg="virtuose" type="middle_node" />
+  
+
+	<node name="hglove2allegro_thumb" pkg="damping_field" type="hglove2allegro_thumb" />
+    
+
+	<!-- <include file="$(find damping_field)/launch/fingers_launch.launch" /> -->
+
+</launch>

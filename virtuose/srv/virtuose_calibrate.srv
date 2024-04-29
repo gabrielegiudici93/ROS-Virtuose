@@ -1,0 +1,18 @@
+# IP address of the hardware
+string ip_address
+
+# Automatic calibration
+# True for automatic, False for manual
+bool automatic
+
+---
+
+# Success
+bool success
+
+# Errors
+# True if error occurred
+bool already_calibrated
+bool hardware_down
+bool timeout
+

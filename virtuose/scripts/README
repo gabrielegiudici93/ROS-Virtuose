@@ -1,0 +1,12 @@
+CollisionIK
+>roslaunch relaxed_ik_ros1 rviz_viewer.launch
+>roslaunch relaxed_ik_ros1 relaxed_ik_rust.launch
+>rosparam set /simulation_time go
+>rosrun relaxed_ik_ros1 keyboard_ikgoal_driver.py
+
+
+>rosnode list
+>rosnode info /robot_state_publisher 
+>rostopic echo /relaxed_ik/ee_pose_goals 
+>rostopic info /relaxed_ik/ee_pose_goals -->MsgType: relaxed_ik_ros1/EEPoseGoals
+

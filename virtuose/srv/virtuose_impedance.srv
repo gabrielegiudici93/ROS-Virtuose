@@ -1,0 +1,31 @@
+# IP address of the hardware
+string ip_address
+
+# Indexing mode
+uint8 indexing_mode
+
+# Motion scale factor (default 1.0) 
+float32 speed_factor
+
+# Force scale factor (default 1.0)
+float32 force_factor
+
+# Max force (in Newtons)
+float32 max_force
+
+# Max torque (in Newton-meters)
+float32 max_torque
+
+# Enable force-feedback (for debug purposes, default True)
+bool power_enable
+
+# Transformation of the base of the Virtuose
+geometry_msgs/Transform base_frame
+
+---
+
+uint32 client_id
+bool success
+bool error
+
+
