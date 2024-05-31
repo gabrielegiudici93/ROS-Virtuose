@@ -36,7 +36,7 @@ float testgit=0;
 int activate_spring_test=0;
 int activate_optoforce_wrench=0; //you need to uncomment line 153  // ros::Subscriber optoForce0_feedback = n_in.subscribe("/optoforce_wrench_1", 5, __OnOPTO0Contact);
 int activate_Crisp_sensor_wrench=1; //you need to uncomment line 155 // ros::Subscriber optoForce0_feedback = n_in.subscribe("/Crisp_IN_2HGlove", 5, __OnCrispFingertipIN);
-
+int proportional_fdbk=1; //1 = proportional_fdbk  2 = position_force_fdbk
 
 int old_H_flag=0;
 uint64_t pose_date;
@@ -61,6 +61,10 @@ bool new_contact=0;
 float initial_contact_pose[7];
 float contact_pose[7];
 float delta_contact_diplacement[7];
+
+
+      float alpha, F1_L_in,F2_L_in,stiff_in;
+
 //
 float virutal_elong__H[3];
 float KK=0;
@@ -314,101 +318,118 @@ spring_force[1]=-(fixed_spring_y_force)*5;
 spring_force[2]=-(fixed_spring_z_force)*5;
 //printf("spring_force: x %f - y %f - z %f \n",spring_force[0],spring_force[1],spring_force[2]);
 }  
-/////////////////////////////// OPTOFORCE ////////////////////////////////////
-////DO NOT MODIFY --- FOR CRISP SENSOR READ BELOW ---
-else if (activate_optoforce_wrench==1 && activate_Crisp_sensor_wrench==0)
-{
-  spring_force[0]= ( -abs((curr_wrench[0])))/5;
-  spring_force[1]=0;//- ( -(curr_wrench[1]))/10;
-  spring_force[2]=0;// ( -(curr_wrench[0]))/10;//5 is a test to increase the force to reach the limit
-  //GENERATE X FORCE
-if (abs(curr_wrench[0])>opto_sensitivity||abs(curr_wrench[1])>opto_sensitivity||abs(curr_wrench[2])>opto_sensitivity)
-{
-  //printf("A\n");
-  force.virtuose_force.force.x = spring_force[0];
-  if (force.virtuose_force.force.x > force_limit) //10 is a safety treshold
-  {
-    force.virtuose_force.force.x = force_limit;
-    spring_force[0]=force_limit;
-    //printf("WARNING: FORCE TRESHOLD X REACHED %f, SETTING SAFETY VALUE %f \n", spring_force[0], force_limit);
-  }
-  else if (force.virtuose_force.force.x < -force_limit)
-  {
-    force.virtuose_force.force.x = -force_limit;
-    spring_force[0]=-force_limit;
-    //printf("WARNING: FORCE TRESHOLD X REACHED %f, SETTING SAFETY VALUE -%f \n", spring_force[0], force_limit);
-  }     
+// /////////////////////////////// OPTOFORCE ////////////////////////////////////
+// ////DO NOT MODIFY --- FOR CRISP SENSOR READ BELOW ---
+// else if (activate_optoforce_wrench==1 && activate_Crisp_sensor_wrench==0)
+// {
+//   spring_force[0]= ( -abs((curr_wrench[0])))/5;
+//   spring_force[1]=0;//- ( -(curr_wrench[1]))/10;
+//   spring_force[2]=0;// ( -(curr_wrench[0]))/10;//5 is a test to increase the force to reach the limit
+//   //GENERATE X FORCE
+// if (abs(curr_wrench[0])>opto_sensitivity||abs(curr_wrench[1])>opto_sensitivity||abs(curr_wrench[2])>opto_sensitivity)
+// {
+//   //printf("A\n");
+//   force.virtuose_force.force.x = spring_force[0];
+//   if (force.virtuose_force.force.x > force_limit) //10 is a safety treshold
+//   {
+//     force.virtuose_force.force.x = force_limit;
+//     spring_force[0]=force_limit;
+//     //printf("WARNING: FORCE TRESHOLD X REACHED %f, SETTING SAFETY VALUE %f \n", spring_force[0], force_limit);
+//   }
+//   else if (force.virtuose_force.force.x < -force_limit)
+//   {
+//     force.virtuose_force.force.x = -force_limit;
+//     spring_force[0]=-force_limit;
+//     //printf("WARNING: FORCE TRESHOLD X REACHED %f, SETTING SAFETY VALUE -%f \n", spring_force[0], force_limit);
+//   }     
 
-//GENERATE Y FORCE
+// //GENERATE Y FORCE
 
-  force.virtuose_force.force.y = spring_force[1];
-  if (force.virtuose_force.force.y > force_limit) //10 is a safety treshold
-  {
-    force.virtuose_force.force.y = force_limit;
-    spring_force[1]=force_limit;
-    //printf("WARNING: FORCE TRESHOLD Y REACHED %f, SETTING SAFETY VALUE %f \n", spring_force[1], force_limit);
-  }
-  else if (force.virtuose_force.force.y < -force_limit)
-  {
-    force.virtuose_force.force.y = -force_limit;
-    spring_force[1]=-force_limit;
-    // printf("WARNING: FORCE TRESHOLD Y REACHED %f, SETTING SAFETY VALUE -%f \n", spring_force[1], force_limit);
-  }     
+//   force.virtuose_force.force.y = spring_force[1];
+//   if (force.virtuose_force.force.y > force_limit) //10 is a safety treshold
+//   {
+//     force.virtuose_force.force.y = force_limit;
+//     spring_force[1]=force_limit;
+//     //printf("WARNING: FORCE TRESHOLD Y REACHED %f, SETTING SAFETY VALUE %f \n", spring_force[1], force_limit);
+//   }
+//   else if (force.virtuose_force.force.y < -force_limit)
+//   {
+//     force.virtuose_force.force.y = -force_limit;
+//     spring_force[1]=-force_limit;
+//     // printf("WARNING: FORCE TRESHOLD Y REACHED %f, SETTING SAFETY VALUE -%f \n", spring_force[1], force_limit);
+//   }     
 
 
-  //GENERATE Z FORCE
+//   //GENERATE Z FORCE
 
-  force.virtuose_force.force.z = spring_force[2];
-  if (force.virtuose_force.force.z > force_limit) //10 is a safety treshold
-  {
-    force.virtuose_force.force.z = force_limit;
-    spring_force[2]=force_limit;
-    // printf("WARNING: FORCE TRESHOLD Z REACHED %f, SETTING SAFETY VALUE %f \n", spring_force[2], force_limit);
-  }
-  else if (force.virtuose_force.force.z < -force_limit)
-  {
-    force.virtuose_force.force.z = -force_limit;
-    spring_force[2]=-force_limit;
-    // printf("WARNING: FORCE TRESHOLD Z REACHED %f, SETTING SAFETY VALUE -%f \n", spring_force[2], force_limit);
-  }     
-}
-    else 
-    {
-            force.virtuose_force.force.x=0.0;
-            force.virtuose_force.force.y = 0.0;
-            force.virtuose_force.force.z=0.0;
-    }
+//   force.virtuose_force.force.z = spring_force[2];
+//   if (force.virtuose_force.force.z > force_limit) //10 is a safety treshold
+//   {
+//     force.virtuose_force.force.z = force_limit;
+//     spring_force[2]=force_limit;
+//     // printf("WARNING: FORCE TRESHOLD Z REACHED %f, SETTING SAFETY VALUE %f \n", spring_force[2], force_limit);
+//   }
+//   else if (force.virtuose_force.force.z < -force_limit)
+//   {
+//     force.virtuose_force.force.z = -force_limit;
+//     spring_force[2]=-force_limit;
+//     // printf("WARNING: FORCE TRESHOLD Z REACHED %f, SETTING SAFETY VALUE -%f \n", spring_force[2], force_limit);
+//   }     
+// }
+//     else 
+//     {
+//             force.virtuose_force.force.x=0.0;
+//             force.virtuose_force.force.y = 0.0;
+//             force.virtuose_force.force.z=0.0;
+//     }
 
-}
+// }
 
 
 
 
 /////////////////////////////// CRISP SENSORS ////////////////////////////////////
-
-
-
-
 else if (activate_optoforce_wrench==0 && activate_Crisp_sensor_wrench==1)
 {
+  
       //2000 is sensor max treshold
       max_treshold=700;//was400
     if(curr_wrench[2]<crisp_sensitivity){
       spring_force[0]=0.0;
     }else if (curr_wrench[2]<=max_treshold){
-      spring_force[0]=-abs(curr_wrench[2])/max_treshold*force_limit;// - abs((cur_pose_H-x_AH))*damp;//*thumb_extra_force_factor;
+      
+      alpha=max_treshold*force_limit;
+      F1_L_in=-abs(curr_wrench[2])/alpha;
+      stiff_in=F1_L_in/delta_contact_diplacement[2];
+      F2_L_in=stiff_in*abs((delta_pos_H[2]));
+
+      if(proportional_fdbk==1)
+        {
+            spring_force[0]=F1_L_in;// - abs((cur_pose_H-x_AH))*damp;//*thumb_extra_force_factor;
+        printf(" alpha  %f",alpha);
+        printf(" F1_L_in  %f",F1_L_in);
+        printf(" stiff_in  %f",stiff_in);
+        printf(" F2_L_in %f \n ",F2_L_in);
+
+        }
+      else if(proportional_fdbk==2)
+        {
+          spring_force[0]=F2_L_in;// - abs((cur_pose_H-x_AH))*damp;//*thumb_extra_force_factor;
+            // spring_force[0]=-abs((delta_pos_H[2])) * (-abs(curr_wrench[2])/max_treshold*force_limit)/delta_contact_diplacement[2];//*thumb_extra_force_factor;
+        }
+
       // printf("Norm of the force vector: %f\n", force_norm);
     
-    // }else if (curr_wrench[2]>100 && curr_wrench[2]<=300){
-    //   spring_force[0]=-force_limit/5;
-    // // }else if (curr_wrench[2]>200 && curr_wrench[2]<=300){
-    // //   spring_force[0]=-force_limit/4;
-    // }else if (curr_wrench[2]>300 && curr_wrench[2]<=500){
-    //   spring_force[0]=-force_limit/2;
-    // // }else if (curr_wrench[2]>400 && curr_wrench[2]<=500){
-    // //   spring_force[0]=-force_limit/2;
-    // }else if (curr_wrench[2]>500 && curr_wrench[2]<=max_treshold ){
-    //   spring_force[0]=-force_limit/1.5;
+            // }else if (curr_wrench[2]>100 && curr_wrench[2]<=300){
+            //   spring_force[0]=-force_limit/5;
+            // // }else if (curr_wrench[2]>200 && curr_wrench[2]<=300){
+            // //   spring_force[0]=-force_limit/4;
+            // }else if (curr_wrench[2]>300 && curr_wrench[2]<=500){
+            //   spring_force[0]=-force_limit/2;
+            // // }else if (curr_wrench[2]>400 && curr_wrench[2]<=500){
+            // //   spring_force[0]=-force_limit/2;
+            // }else if (curr_wrench[2]>500 && curr_wrench[2]<=max_treshold ){
+            //   spring_force[0]=-force_limit/1.5;
 
     }else if (curr_wrench[2]>max_treshold){
       spring_force[0]=-1*force_limit;
@@ -423,7 +444,7 @@ else if (activate_optoforce_wrench==0 && activate_Crisp_sensor_wrench==1)
     spring_force[1]=spring_force[0];//
     
     spring_force[2]=0;// 
-    printf("stiffness  %f \n", spring_force[0]/delta_contact_diplacement[2]);
+    // printf("stiffness  %f \n", spring_force[0]/delta_contact_diplacement[2]);
 
     stiff_msg.data=spring_force[0]/delta_contact_diplacement[2];
     in_stiffness.publish(stiff_msg);
@@ -486,8 +507,8 @@ else if (activate_optoforce_wrench==0 && activate_Crisp_sensor_wrench==1)
 //         force.virtuose_force.force.z=0.0;
 // }
 
-}
 
+}
 
 
 
