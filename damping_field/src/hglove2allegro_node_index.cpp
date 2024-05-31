@@ -31,6 +31,7 @@ uint64_t status_date;
 float x_h[3];
 float x_AH[7];
 float damp=1;
+float testgit=0;
 //SET THE FORCE FEEDBACK MODE 0 FALSE 1 TRUE
 int activate_spring_test=0;
 int activate_optoforce_wrench=0; //you need to uncomment line 153  // ros::Subscriber optoForce0_feedback = n_in.subscribe("/optoforce_wrench_1", 5, __OnOPTO0Contact);
