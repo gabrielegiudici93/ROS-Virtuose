@@ -1,0 +1,73 @@
+CREATE A SHORTCUT FOR RUNNING ALL THE NODES OF THE HGLOVE
+
+I know this post is old, but i recently wanted to do a similar thing (roslaunch using desktop shortcut ) and gave me some trouble the past few days so I decided to write the steps i took for anyone that might be interested in the future.
+
+First of, I created a hidden folder in my home directory to place the script and image I was going to use for the shortcut:
+
+    mkdir .dir_name
+I then placed the image I wanted to use in there and created a script using the sublime text editor ( my choice, you can use your favourite one - it makes absolutely no difference at all )
+
+    subl .dir_name/launch.sh
+The launch file looks like this:
+
+#!/usr/bin/env bash
+
+# Launch the robot
+source /opt/ros/melodic/setup.bash 
+source /home/user/ros_ws/devel/setup.bash 
+
+echo "Launching application, please wait!"
+roslaunch your_pkg your_launch.launch 
+        ####
+        #!/usr/bin/env bash
+
+        # Launch the robot
+        source /opt/ros/melodic/setup.bash 
+        #source /home/user/ros_ws/devel/setup.bash 
+        source /home/mustafar/ROS-Virtuose/devel/setup.bash
+
+        echo "Launching thumb_node application, please wait!"
+        #roslaunch your_pkg your_launch.launch 
+        rosrun virtuose thumb_node &
+        sleep 5
+        rosrun virtuose index_node &
+        sleep 1
+        rosrun virtuose middle_node &
+
+        rosrun damping_field hglove2allegro_thumb &
+        sleep 5
+
+        rosrun damping_field hglove2allegro_index &
+
+        sleep 5
+        rosrun damping_field hglove2allegro_middle 
+        ####
+Important note: you MUST include the sourcing of the bash files, otherwise the roslaunch command is not recognised!
+
+Important note 2: you MUST make the script executable
+
+    chmod +x .my_dir/launch.sh
+The next step is to create the desktop shortcut:
+
+    subl ~/Desktop/my_shortcut.desktop
+and adding the following inside the file what we just created:
+
+    [Desktop Entry]
+    Type=Application
+    Terminal=false $ true opens extra gnome-terminal
+    Name=Robot Launch
+    Icon=/home/user/.my_dir/logo.png
+    Exec=terminator -e "bash -c '/home/user/.my_dir/launch.sh;$SHELL'" 
+    $Exec=gnome-terminal -e "bash -c '/home/user/.my_dir/launch.sh;$SHELL'"
+Note: I am using terminator, if you are using the default gnome terminal, comment the terminator line and uncomment the gnome-terminal line.
+
+Finally, you need to right click the desktop shortcut ( icon will appear after it has been run once ) and go to permissions tab. There you must click
+
+allow executing file as program
+Once the shortcut is now double clicked it will run. The very first time you double click the system will ask you again if you want to execute this file (for security reasons) and you must click yes ( after all its your file ;) )
+
+That's it! Enjoy your desktop shortcut launching ros code!
+
+ref1 to https://stackoverflow.com/questions/50812382/using-a-shell-script-to-call-a-ros-launch-file/65884166#65884166
+
+ref2 to https://stackoverflow.com/questions/3004811/how-do-you-run-multiple-programs-in-parallel-from-a-bash-script
