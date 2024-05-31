@@ -233,7 +233,7 @@ virutal_elong__H[1]=-(initial_pose_H[1]-cur_pose_H[1]);
 virutal_elong__H[2]=-(initial_pose_H[2]-cur_pose_H[2]);
 
 
-    force_limit=5;
+    force_limit=10;
     KK_fix=50;// 100 STRONG FORCE, 10 LIGHT FORCE 
     KK_curr=0;//150;
 
@@ -327,20 +327,45 @@ if (abs(curr_wrench[0])>opto_sensitivity||abs(curr_wrench[1])>opto_sensitivity||
 
 /////////////////////////////// CRISP SENSORS ////////////////////////////////////
 
+// else if (activate_optoforce_wrench==0 && activate_Crisp_sensor_wrench==1)
+// {
+//       //2000 is sensor max treshold
+//       max_treshold=600;//was 400
+//     if(curr_wrench[2]<crisp_sensitivity){
+//       spring_force[0]=0.0;
+//     }else if (curr_wrench[2]<=max_treshold){
+//       spring_force[0]=-abs(curr_wrench[2])/max_treshold*force_limit;//*thumb_extra_force_factor;
+//     }else if (curr_wrench[2]>max_treshold){
+//       spring_force[0]=-1*force_limit;
+//     }
+//     // if(curr_wrench[2]<-crisp_sensitivity){
+//     //   spring_force[0]=-abs(curr_wrench[2])/max_treshold*force_limit/2;
+//     // }
+
 else if (activate_optoforce_wrench==0 && activate_Crisp_sensor_wrench==1)
 {
       //2000 is sensor max treshold
-      max_treshold=200;
+      max_treshold=700;//was400
     if(curr_wrench[2]<crisp_sensitivity){
       spring_force[0]=0.0;
     }else if (curr_wrench[2]<=max_treshold){
-      spring_force[0]=-abs(curr_wrench[2])/max_treshold*force_limit;//*thumb_extra_force_factor;
+      spring_force[0]=-abs(curr_wrench[2])/max_treshold*force_limit;// - abs((cur_pose_H-x_AH))*damp;//*thumb_extra_force_factor;
+    //   // printf("Norm of the force vector: %f\n", force_norm);
+
+    // }else if (curr_wrench[2]>100 && curr_wrench[2]<=300){
+    //   spring_force[0]=-force_limit/5;
+    // // }else if (curr_wrench[2]>200 && curr_wrench[2]<=300){
+    // //   spring_force[0]=-force_limit/4;
+    // }else if (curr_wrench[2]>300 && curr_wrench[2]<=500){
+    //   spring_force[0]=-force_limit/2;
+    // // }else if (curr_wrench[2]>400 && curr_wrench[2]<=500){
+    // //   spring_force[0]=-force_limit/2;
+    // }else if (curr_wrench[2]>500 && curr_wrench[2]<=max_treshold ){
+    //   spring_force[0]=-force_limit/1.5;
+
     }else if (curr_wrench[2]>max_treshold){
       spring_force[0]=-1*force_limit;
     }
-    // if(curr_wrench[2]<-crisp_sensitivity){
-    //   spring_force[0]=-abs(curr_wrench[2])/max_treshold*force_limit/2;
-    // }
 
     // spring_force[0]= ( -abs((curr_wrench[0])))/50;/////////////////////////////////////////////////////////////////////////////////////////////////////
     spring_force[1]=-spring_force[0];
