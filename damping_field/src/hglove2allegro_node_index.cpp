@@ -141,10 +141,22 @@ void __OnCrispFingertipIN(const geometry_msgs::WrenchStamped::ConstPtr& msg)
   curr_wrench[3] = computeNorm(curr_wrench);
 
  if (curr_wrench[2]<= crisp_sensitivity)
+ {
    new_contact=0;
+      for(int i=0;i<7;i++)
+   {
+   delta_contact_diplacement[i]=0.0;  
+   initial_contact_pose[i]=x_AH[i];
+   }
+ }
  else 
-   new_contact=1;
-
+   {new_contact=1;
+       for(int i=0;i<7;i++)
+   {
+   contact_pose[i]=x_AH[i];
+   delta_contact_diplacement[i]=contact_pose[i]-initial_contact_pose[i];
+   }
+   }
 }
 
 // Callback for topic out_virtuose_status
@@ -168,18 +180,18 @@ void __OnFingerPos(const geometry_msgs::PoseArray::ConstPtr& msg)
   x_AH[5]= msg->poses[0].orientation.z;
   x_AH[6]= msg->poses[0].orientation.x;
 
-if (new_contact==0)
-   for(int i=0;i<7;i++)
-   {
-   delta_contact_diplacement[i]=0.0;  
-   initial_contact_pose[i]=x_AH[i];
-   }
-else
-   for(int i=0;i<7;i++)
-   {
-   contact_pose[i]=x_AH[i];
-   delta_contact_diplacement[i]=contact_pose[i]-initial_contact_pose[i];
-   }
+// if (new_contact==0)
+//    for(int i=0;i<7;i++)
+//    {
+//    delta_contact_diplacement[i]=0.0;  
+//    initial_contact_pose[i]=x_AH[i];
+//    }
+// else
+//    for(int i=0;i<7;i++)
+//    {
+//    contact_pose[i]=x_AH[i];
+//    delta_contact_diplacement[i]=contact_pose[i]-initial_contact_pose[i];
+//    }
 
 }
 
